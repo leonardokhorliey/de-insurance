@@ -6,7 +6,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract DeInsureToken is ERC1155, Ownable {
 
-    uint[] public tokenTypes;
+    // defines the premium percent to be paid 
+    struct PackageType {
+        uint tokenId;
+        uint premiumPercentage;
+    }
+
+    PackageType[] public tokenTypes;
 
     enum InsuranceValuationType {
         USER_VALUED,
@@ -17,18 +23,29 @@ contract DeInsureToken is ERC1155, Ownable {
         tokenTypes = [];
     }
 
-    function createNewToken(uint memory tokenCode) public onlyOwner {
-        _mint(msg.sender, tokenCode, 1, "");
 
-        tokenTypes.push(tokenCode);
+    // defines the monthly premium percentage as a 4-digit number (fraction * 10000)
+    function createNewToken(uint _tokenCode, uint _premiumPercentage) public onlyOwner {
+        _mint(msg.sender, _tokenCode, 1, "");
+
+        tokenTypes.push(PackageType(_tokenCode, _premiumPercentage));
     }
 
     function isTokenType(uint _tokenType) public view returns (bool) {
         for (uint i = 0; i < tokenTypes.length; i++) {
-            if (tokenTypes[i] == _tokenType) return true;
+            if (tokenTypes[i].tokenId == _tokenType) return true;
         }
 
         return false;
+    }
+
+    function getPackageType(uint _tokenType) public view returns (PackageType memory) {
+        PackageType memory pkg;
+        for (uint i = 0; i < tokenTypes.length; i++) {
+            if (tokenTypes[i].tokenId == _tokenType) pkg = tokenTypes[i];
+        }
+
+        return pkg;
     }
 
     

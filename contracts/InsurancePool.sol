@@ -8,8 +8,13 @@ import "./USDTInterface.sol";
 
 contract InsurancePool {
 
+    struct ConfirmWithValuation {
+        uint valuationAmount;
+        address verifier;
+    }
+
     struct RegistrationVerifiers {
-        address[] approvers;
+        ConfirmWithValuation[] approvers;
         address[] decliners;
     }
 
@@ -18,6 +23,8 @@ contract InsurancePool {
         string docsURI;
         address user;
         uint status;
+        uint createdAt;
+        uint valuationAmount;
     }
 
     struct Pool {
@@ -28,10 +35,10 @@ contract InsurancePool {
         address[] contributors;
     }
 
-    DeInsureToken tokenAddress;
-    Verifier verifierContractAddress;
+    DeInsureToken tokenContract;
+    Verifier verifierContract;
 
-    USDTInterface public immutable usdtAddress;
+    USDTInterface public immutable usdtContract;
     Registration[] public registrations;
 
     mapping (uint => address[]) enrolledUsers;
@@ -40,17 +47,19 @@ contract InsurancePool {
     mapping(address => mapping(bytes => uint)) contributionPoolAmounts;
 
 
-    event RegisterForInsurance(uint tokenType, address user, string docsURI);
-    event VerifyRegistrationDocs(address verifier, address user);
+    event RegisterForInsurance(uint tokenType, address user, string docsURI, uint valuation);
+    event VerifyRegistrationDocs(address verifier, address user, uint valuation);
+    event RejectRegistrationDocs(address verifier, address user);
+    event PayPremium(address user, uint amount);
 
     modifier isVerifier {
         require(verifierContractAddress.isVerifier(msg.sender), "Not a valid verifier");
         _;
     }
 
-    constructor (address usdtAddress, address verifierContract) {
-        usdtAddress = USDTInterface(usdtAddress);
-        verifierContractAddress = Verifier(verifierContract);
+    constructor (address _usdtAddress, address verifierContractAddress) {
+        usdtContract = USDTInterface(_usdtAddress);
+        verifierContract = Verifier(verifierContractAddress);
     }
 
     function hasCheckedReg(address verifier, _registrationId) public view returns (bool) {
@@ -67,12 +76,12 @@ contract InsurancePool {
         return false;
     }
 
-    function registerForInsurance(string memory supportingDocsURI, uint tokenType) public {
+    function registerForInsurance(string memory supportingDocsURI, uint tokenType, uint valuationAmount) public {
         require(enrolmentStatus(msg.sender, tokenType) == -1 || enrolmentStatus(msg.sender, tokenType) == 2, "User already has a pending or active registration");
 
-        Registration memory reg = Registration(tokenType, supportingDocsURI, msg.sender, 0);
+        Registration memory reg = Registration(tokenType, supportingDocsURI, msg.sender, 0, block.timestamp, valuationAmount);
 
-        emit RegisterForInsurance(tokenType, msg.sender, supportingDocsURI);
+        emit RegisterForInsurance(tokenType, msg.sender, supportingDocsURI, valuationAmount);
     }
 
 
@@ -86,7 +95,7 @@ contract InsurancePool {
         return -1;
     }
 
-    function verifyRegistration(uint _registrationId) public isVerifier {
+    function verifyRegistration(uint _registrationId, uint valuationAmount) public isVerifier {
         require(_registrationId < registrations.length, "Not a valid registration id");
         Registration memory reg = registrations[_registrationId];
 
@@ -97,9 +106,13 @@ contract InsurancePool {
         // check if up to 70% of verifiers have approved registration, and confirm it.
         if ((veriferContractAddress.verifierCount() * 7) <= (registrationVerifiers[_registrationId].approvers.length * 10)) {
             registrations[_registrationId].status = 1;
+            registrations[_registrationId].valuationAmount = computeSuggestedValuation(_registrationId)/1e18;
+
+
         }
 
         verifierActionCount[msg.sender] += 1;
+        emit VerifyRegistrationDocs(msg.sender, reg.user, computeSuggestedValuation(_registrationId)/1e18);
 
     }
 
@@ -113,10 +126,37 @@ contract InsurancePool {
 
         // check if up to 50% of verifiers have declined registration, and completely decline it.
         if ((veriferContractAddress.verifierCount() * 5) <= (registrationVerifiers[_registrationId].decliners.length * 10)) {
-            registrations[_registrationId].status = 1;
+            registrations[_registrationId].status = 2;
+            
         }
 
-        verifierActionCount[msg.sender] += 1;      
+        verifierActionCount[msg.sender] += 1; 
+        emit RejectRegistrationDocs(msg.sender, reg.user);     
+    }
+
+    function computeSuggestedValuation(uint _registrationId) internal view returns (uint) {
+        ConfirmWithValuation[] memory regs = registrationVerifiers[_registrationId].approvers;
+
+        uint sum_ = 0;
+        uint count = 0;
+
+        for (; count < regs.length; count++) {
+            sum += regs[i].valuationAmount;
+        }
+
+        return (sum_ * 1e18)/count;
+
+    }
+
+    function payPremium(uint _usdtAmount, uint _registrationId) public {
+        Registration memory reg = registrations[_registrationId];
+        uint premiumPercentage = tokenContract.getPackageType(reg.tokenType);
+
+        require((_usdtAmount * 10000) >= (reg.valuationAmount * premiumPercentage), "You did not send sufficient USDT");
+
+        usdtContract.transfer(address(this), _usdtAmount);
+        emit PayPremium(msg.sender, _usdtAmount);
+
     }
 
 
