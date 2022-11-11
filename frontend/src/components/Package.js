@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 
 const Package = ({pkg}) => {
 
@@ -13,7 +14,8 @@ const Package = ({pkg}) => {
                     {pkg.description}
                 </p>
                 <button id="package-cta">
-                    See More
+                    <Link style={{ textDecoration: 'none', fontFamily: 'Montserrat', fontWeight: 300, color: 'white' }} to={`/packages/${pkg.id}`}>See More </Link>
+                    
                 </button>
             </div>
         </div>

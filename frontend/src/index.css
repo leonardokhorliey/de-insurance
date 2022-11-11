@@ -113,7 +113,7 @@ nav > ul {
   justify-content: space-between;
   width: 100%;
   list-style: none;
-  gap: 5rem;
+  gap: 3rem;
 }
 
 nav > ul > li {
@@ -125,10 +125,19 @@ nav > ul > li {
   border: 0;
   background-color: peru;
   color: white;
-  font-family: 'Montserrat' sans-serif;
   font-weight: 500;
   height: 50px;
   width: 250px;
+  padding: 5px 20px;
+}
+
+#account > h2 {
+  font-size: 0.875rem;
+}
+
+#account > p {
+  font-weight: 800;
+  font-size: 1.25rem;
 }
 
 #top-banner {
@@ -194,11 +203,23 @@ nav > ul > li {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   margin: 50px auto;
+  width: 100%;
   gap: 50px 50px;
 }
 
 .single-package {
- 
+  display: flex;
+  flex-direction: column;
+  align-items: baseline;
+  width: 100%;
+}
+
+.single-package > img {
+  width: 400px;
+  height: 400px;
+  border-radius: 10px;
+  
+  
 }
 
 .package-description {

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 
 
 
-const NavBar = ({address, balance, signedIn}) => {
+const NavBar = ({address, balance, signedIn, connectWallet}) => {
     
 
 
@@ -25,6 +25,10 @@ const NavBar = ({address, balance, signedIn}) => {
                             <li>
                                 <Link style={{ textDecoration: 'none', fontFamily: 'Montserrat', fontWeight: 300 }}to= "/about">About</Link>
                             </li>
+
+                            <li>
+                                <Link style={{ textDecoration: 'none', fontFamily: 'Montserrat', fontWeight: 300 }}to= "/profile">Profile</Link>
+                            </li>
                         </ul>
 
                     </nav>
@@ -35,11 +39,11 @@ const NavBar = ({address, balance, signedIn}) => {
                             {address}
                         </h2>
                         <p>
-                            {balance}
+                            {`${balance} tBNB`}
                         </p>
                     </div>: 
 
-                    <button id="account" style={{cursor: 'pointer', width: '150px'}}>Connect Wallet</button>}
+                    <button id="account" onClick={connectWallet} style={{cursor: 'pointer', width: '150px'}}>Connect Wallet</button>}
                 </div>
                 
             </div>

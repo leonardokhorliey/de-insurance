@@ -31,7 +31,7 @@ const Dashboard = ({balances, packagesEnrolled, claimsMade, address}) => {
             <div className="intro-area">
                 <div className="balance-box">
                     <h3>
-                        ETH Balance
+                        BNB Balance
                     </h3>
                     <p>
                         {balance.eth}

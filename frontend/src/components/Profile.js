@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import AdminView from "./AdminView"
 import Dashboard from "./Dashboard";
 import ProfileSidebar from "./ProfileSidebar";
@@ -7,11 +7,11 @@ import ProfileSidebar from "./ProfileSidebar";
 const Profile = ({address}) => {
 
     const [currentPageKey, setCurrentPageKey] = useState('dashboard');
-    const [address_, setAddress] = useState('0xfffffffffffff')
+    const [address_, setAddress] = useState('')
 
     const mapping = {
         'admin': <AdminView pendingVerifiers/>,
-        'dashboard': <Dashboard balances packagesEnrolled claimsMade address/>
+        'dashboard': <Dashboard balances packagesEnrolled claimsMade address= {address_}/>
     }
 
     const setSelectedSidebar = (key) => {
@@ -19,6 +19,10 @@ const Profile = ({address}) => {
 
 
     }
+
+    useEffect(() => {
+        setAddress(`${address.substring(0, 25)}...`);
+    }, [address])
 
 
     return (

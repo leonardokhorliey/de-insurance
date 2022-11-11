@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.6;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./USDTInterface.sol";
@@ -19,8 +19,8 @@ contract Verifier is Ownable {
 
     VerifierApplication[] public verifierApplications;
 
-    mapping (address => bool) verifiers;
-    mapping (address => bool) blackListedVerifiers;
+    mapping (address => bool) public verifiers;
+    mapping (address => bool) public blackListedVerifiers;
 
     USDTInterface public usdtContract;
     address public poolAddress;
@@ -34,10 +34,10 @@ contract Verifier is Ownable {
         usdtContract = USDTInterface(usdtAddress);
     }
 
-    function setPoolAddress(address poolAddress) public onlyOwner {
-        require(poolAddress != address(0), "Pool address already set");
+    function setPoolAddress(address _poolAddress) public onlyOwner {
+        require(poolAddress == address(0), "Pool address already set");
 
-        poolAddress = poolAddress;
+        poolAddress = _poolAddress;
     }
 
     function registerAsVerifier(string memory profileDocURI, uint contributionAmount) public {

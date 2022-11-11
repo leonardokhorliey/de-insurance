@@ -1,50 +1,19 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.6;
 
 import "./Token.sol";
 import "./Verifier.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./USDTInterface.sol";
+import {
+    ConfirmWithValuation,
+    RegistrationVerifiers,
+    ClaimVerifiers,
+    Registration,
+    Claim
+} from "./ContractStructs.sol";
 
 contract InsurancePool {
-    struct ConfirmWithValuation {
-        uint256 valuationAmount;
-        address verifier;
-    }
-
-    struct RegistrationVerifiers {
-        ConfirmWithValuation[] approvers;
-        address[] decliners;
-    }
-
-    struct Registration {
-        uint256 tokenType;
-        string docsURI;
-        address user;
-        uint256 status;
-        uint256 createdAt;
-        uint256 valuationAmount;
-    }
-
-    struct Pool {
-        uint256 numberOfParticipants;
-        bytes poolCode;
-        address creator;
-        uint256 totalInvestment;
-        address[] contributors;
-    }
-    //ERC115 is representing categories of insurance e.g, premium, third party e.t.c
-    //the IPFS contains an object that holds the documents url, other meta data like name, ...
-    struct Claim {
-        string docsURI;
-        uint256 amount;
-        address userAddress;
-        uint256 tokenType; //this represents the type of the insurance e.g premium, third party
-        uint256 status;
-        uint256 createdAt;
-        address[] verifiers;
-        address[] decliners;
-    }
 
     DeInsureToken tokenContract;
     Verifier verifierContract;
@@ -54,7 +23,8 @@ contract InsurancePool {
     Claim[] public claims;
 
     mapping(uint256 => address[]) tokenTypeToEnrolledUsers; //Token Type represents the tokenId
-    mapping(uint256 => RegistrationVerifiers) registrationVerifiers; //generate unique random key
+    mapping(uint256 => RegistrationVerifiers) registrationVerifiers;
+    mapping(uint256 => ClaimVerifiers) claimVerifiers; //generate unique random key
     mapping(address => uint256) verifierActionCount;
     mapping(address => mapping(bytes => uint256)) contributionPoolAmounts;
     mapping(address => Registration[]) public userToRegistration;
@@ -68,12 +38,17 @@ contract InsurancePool {
     );
     event VerifyRegistrationDocs(
         address verifier,
-        address user,
+        uint _registrationId,
         uint256 valuation
     );
-    event RejectRegistrationDocs(address verifier, address user);
+    event RejectRegistrationDocs(address verifier, uint _registrationId);
     event PayPremium(address user, uint256 amount);
-    event MakeClaim(address user, uint256 amount);
+    event MakeClaim(
+        uint256 tokenType,
+        address user,
+        string docsURI,
+        uint256 amount
+    );
     event VerifyClaim(address verifier, uint256 claimId);
 
     modifier isVerifier() {
@@ -84,9 +59,10 @@ contract InsurancePool {
         _;
     }
 
-    constructor(address _usdtAddress, address verifierContractAddress) {
+    constructor(address _usdtAddress, address verifierContractAddress, address _tokenContractAddress) {
         usdtContract = USDTInterface(_usdtAddress);
         verifierContract = Verifier(verifierContractAddress);
+        tokenContract = DeInsureToken(_tokenContractAddress);
     }
 
     function hasCheckedReg(address verifier, uint256 _registrationId)
@@ -100,6 +76,26 @@ contract InsurancePool {
 
         for (uint256 i = 0; i < verifiers.approvers.length; i++) {
             if (verifiers.approvers[i].verifier == verifier) return true;
+        }
+
+        for (uint256 i = 0; i < verifiers.decliners.length; i++) {
+            if (verifiers.decliners[i] == verifier) return true;
+        }
+
+        return false;
+    }
+
+    function hasCheckedClaim(address verifier, uint256 _claimId)
+        public
+        view
+        returns (bool)
+    {
+        ClaimVerifiers memory verifiers = claimVerifiers[
+            _claimId
+        ];
+
+        for (uint256 i = 0; i < verifiers.approvers.length; i++) {
+            if (verifiers.approvers[i] == verifier) return true;
         }
 
         for (uint256 i = 0; i < verifiers.decliners.length; i++) {
@@ -190,7 +186,7 @@ contract InsurancePool {
         verifierActionCount[msg.sender] += 1;
         emit VerifyRegistrationDocs(
             msg.sender,
-            reg.user,
+            _registrationId,
             computeSuggestedValuation(_registrationId) / 1e18
         );
     }
@@ -218,7 +214,7 @@ contract InsurancePool {
         }
 
         verifierActionCount[msg.sender] += 1;
-        emit RejectRegistrationDocs(msg.sender, reg.user);
+        emit RejectRegistrationDocs(msg.sender, _registrationId);
     }
 
     function computeSuggestedValuation(uint256 _registrationId)
@@ -250,7 +246,8 @@ contract InsurancePool {
             (_usdtAmount * 10000) >= (reg.valuationAmount * premiumPercentage),
             "You did not send sufficient USDT"
         );
-        usdtContract.transfer(address(this), _usdtAmount);
+        usdtContract.transferFrom(msg.sender, address(this), _usdtAmount);
+        tokenContract.mintToClient(msg.sender, reg.tokenType, _usdtAmount);
         emit PayPremium(msg.sender, _usdtAmount);
     }
 
@@ -259,44 +256,38 @@ contract InsurancePool {
         uint256 _amount,
         uint256 tokenType
     ) external {
+        uint balanceOfToken = tokenContract.balanceOf(msg.sender, tokenType);
+        uint exceedings = tokenContract.exceedingAmounts(msg.sender, tokenType);
         //Check the balance for the tokenType specified
         //TODO Verify that you meet up with your monthly subscription
-
-        Claim memory claim = Claim(
+        require (balanceOfToken * 5 > (_amount - balanceOfToken)*10 && (exceedings * 5) > (_amount - balanceOfToken)*10, "Not sufficient contribution made to make this claim");
+        claims.push(Claim(
             _docURI,
             _amount,
             msg.sender,
             tokenType,
             0,
-            block.timestamp,
-            new address[](0),
-            new address[](0)
-        );
-        claims.push(claim);
+            block.timestamp
+        ));
 
-        emit MakeClaim(msg.sender, _amount);
+        emit MakeClaim(tokenType, msg.sender, _docURI, _amount);
     }
 
-    // function getUnverifiedClaims() external {
-    //     Claim[]  storage response;
-
-    //     for(uint i = 0; i < claims.length; i++){
-    //         if(claims[i].status == 0){
-    //           response.push(claims[i]);
-    //         }
-    //     }
-    // }
-
     function verifyClaim(uint256 claimId) external {
-        Claim storage claim = claims[claimId];
-        uint256 totalVerifiers = verifierContract.verifierCount();
-        uint256 totalVerifiersForClaim = claim.verifiers.length;
+        Claim memory claim = claims[claimId];
+        require(
+            claim.status == 0 && !hasCheckedClaim(msg.sender, claimId),
+            "Already called this function on this registration."
+        );
 
-        if ((totalVerifiers * 7) <= (totalVerifiersForClaim * 10)) {
-            claim.status = 1;
-            usdtContract.transfer(msg.sender, claim.amount);
+        if (
+            (verifierContract.verifierCount() * 7) <=
+            (claimVerifiers[claimId].approvers.length * 10)
+        ) {
+            claims[claimId].status = 1;
+            tokenContract.burnFromClient(claim.user, claim.tokenType, claim.amount);
+            usdtContract.transfer(claim.user, claim.amount);
         }
-        claims[claimId].verifiers.push(msg.sender);
         emit VerifyClaim(msg.sender, claimId);
     }
 }
