@@ -20,7 +20,7 @@ contract DeInsureToken is ERC1155, Ownable {
     }
 
     constructor(string memory ipfsDirectory) ERC1155(string(abi.encodePacked(ipfsDirectory, "{id}.sol"))) {
-        tokenTypes = [];
+    
     }
 
 

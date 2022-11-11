@@ -22,7 +22,7 @@ contract Verifier is Ownable {
     mapping (address => bool) verifiers;
     mapping (address => bool) blackListedVerifiers;
 
-    USDTInterface public usdtAddress;
+    USDTInterface public usdtContract;
     address public poolAddress;
 
     event VerifierEnrol(address user, string docsURI, uint contributionAmount);
@@ -31,7 +31,7 @@ contract Verifier is Ownable {
     event BlacklistVerifier(address verifier);
 
     constructor(address usdtAddress) {
-        usdtAddress = USDTInterface(usdtAddress);
+        usdtContract = USDTInterface(usdtAddress);
     }
 
     function setPoolAddress(address poolAddress) public onlyOwner {
@@ -41,9 +41,9 @@ contract Verifier is Ownable {
     }
 
     function registerAsVerifier(string memory profileDocURI, uint contributionAmount) public {
-        require(!enrolledAsVerifier(msg.sender), "Previously attempted enroll as verifier");
+        require(enrolledAsVerifier(msg.sender) == -1, "Previously attempted enroll as verifier");
 
-        usdtAddress.transfer(poolAddress, contributionAmount);
+        usdtContract.transfer(poolAddress, contributionAmount);
 
         verifierApplications.push(VerifierApplication(msg.sender, profileDocURI, 0));
     }
@@ -55,7 +55,7 @@ contract Verifier is Ownable {
     function enrolledAsVerifier(address addr_) public view returns (int) {
         if (isVerifier(addr_)) return 1;
         for (uint i = 0; i < verifierApplications.length; i++) {
-            if (verifierApplications[i].user == addr_) return verifierApplications[i].status;
+            if (verifierApplications[i].user == addr_) return int(verifierApplications[i].status);
         }
 
         return -1;
@@ -66,7 +66,7 @@ contract Verifier is Ownable {
         require(applicationIndex >= 0 && !isVerifier(potentialVerifier), "User already approved or never registered");
 
         verifiers[potentialVerifier] = true;
-        verifierApplications[applicationIndex].status = 1;
+        verifierApplications[uint256(applicationIndex)].status = 1;
         verifierCount += 1;
         emit ConfirmVerifierEnrol(potentialVerifier);
     }
@@ -75,21 +75,21 @@ contract Verifier is Ownable {
         int applicationIndex = enrolledAsVerifier(potentialVerifier);
         require(enrolledAsVerifier(potentialVerifier) >= 0 && !isVerifier(potentialVerifier), "User already approved or never registered");
 
-        verifierApplications[applicationIndex].status = 2;
+        verifierApplications[uint256(applicationIndex)].status = 2;
         verifierCount += 1;
-        emit DeclineVerifierEnrol(potentialVerifier);
+        emit DeclineVerfierEnrol(potentialVerifier);
     }
 
 
-    function blacklistVerifier(address verifier_) public onlyOwner {
-        require(isVerifier(verifier_), "Not a verifier");
-        int applicationIndex = enrolledAsVerifier(potentialVerifier);
+    function blacklistVerifier(address _verifier) public onlyOwner {
+        require(isVerifier(_verifier), "Not a verifier");
+        int applicationIndex = enrolledAsVerifier(_verifier);
 
-        verifiers[verifier_] = false;
-        verifierApplications[applicationIndex].status = 2;
+        verifiers[_verifier] = false;
+        verifierApplications[uint256(applicationIndex)].status = 2;
         verifierCount -= 1;
-        blackListedVerifiers[verifier_] = true;
-        emit BlacklistVerifier(verifier_);
+        blackListedVerifiers[_verifier] = true;
+        emit BlacklistVerifier(_verifier);
     }
 
 
