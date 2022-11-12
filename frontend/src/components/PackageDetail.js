@@ -43,7 +43,8 @@ const PackageDetail = ({packages, address, balance, connectWallet, signedIn, set
     const [lastDocId, setLastDocId] = useState(1);
     const [docs, setDocs] = useState([{
         id: 1,
-        description: ""
+        description: "",
+        image: ""
     }])
 
     useEffect(() => {
@@ -54,29 +55,25 @@ const PackageDetail = ({packages, address, balance, connectWallet, signedIn, set
         setPkg(packages.filter(pkg => pkg.id == packageType)[0]);
     }, [packages])
 
-    const updateDocumentDescription = (id, description) => {
+    const updateDocs = (id, newValue, key) => {
+        const copyOfDocs = JSON.parse(JSON.stringify(docs));
+        const docToBeUpdated = copyOfDocs.filter(doc => doc.id === id)[0];
+        docToBeUpdated[key] = newValue;
 
-        setDocs(prev => {
-
-            // prev.map(item => {
-            //     if (item.id === id)
-            // }) 
-            console.log(prev);
-            for (let i= 0; i< prev.length; i++) {
-                if (prev[i].id === id) prev[i].description = description
-            }
-            return prev;
-        })
+        setDocs(copyOfDocs);
     }
 
     const addNewDocument = () => {
+        
 
         const newId = lastDocId + 1;
+
 
         setDocs(prev => [
             ...prev, {
                 id: newId,
-                description: ""
+                description: "",
+                image: ""
             }
         ])
 
@@ -92,14 +89,18 @@ const PackageDetail = ({packages, address, balance, connectWallet, signedIn, set
 
     const uploadImagestoIpfs = async () => {
 
-        let files = [];
 
-        images.forEach(img => {
-            let content;
-            content.path= `${img.file.name}.json`;
-            content.content = img.file;
-            files.push(content);
-        }) 
+        // images.forEach(img => {
+        //     let content = {} ;
+        //     content.path= `${img.file.name}.json`;
+        //     content.content = img.file;
+        //     files.push(content);
+        // }) 
+
+        const files = images.map(img => ({
+            path: `${img.file.name}.json`,
+            content : img.file
+        }))
 
         
 
@@ -207,16 +208,19 @@ const PackageDetail = ({packages, address, balance, connectWallet, signedIn, set
 
                                     <div class="form-area">
                                         <label>Enter file description</label>
-                                        <input type="text" value={docs.filter(doc => doc.id === ele.id)[0].description} 
-                                        onChange={(e) => updateDocumentDescription(ele.id, e.target.value)}/>
+                                        <input type="text" value={ele.description} 
+                                        onChange={(e) => updateDocs(ele.id, e.target.value, 'description')}
+                                        />
                                     </div>
                                     
                                     <div class="form-area"> 
                                         <label>Upload file</label>
                                         <input type="file" 
-                                        onChange={(e) => {
-                                            setImages(prev => [...prev, {id: ele.id, name: e.target.files[0].name, file: e.target.files[0]}]);
-                                        }}/>
+                                        
+                                        // onChange={(e) => {
+                                        //     setImages(prev => [...prev, {id: ele.id, name: e.target.files[0].name, file: e.target.files[0]}]);
+                                        // }}
+                                        />
                                     </div>
 
                                     
@@ -224,7 +228,7 @@ const PackageDetail = ({packages, address, balance, connectWallet, signedIn, set
                             )
                         }
 
-                        <button style={{width: '300px'}} onChange={() => addNewDocument()}>
+                        <button style={{width: '300px'}} onClick={() => addNewDocument()}>
                             Add another Document
                         </button>
                 </div>

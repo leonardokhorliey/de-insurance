@@ -30,12 +30,9 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
-    rinkeby: {
-      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_ID}`, //Infura url with projectId
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [] // add the account that will deploy the contract (private key)
-    },
+    // Moralis Node RPC URL didnt work and kept failing
     bscTestnet: {
-      url: `https://nd-789-768-054.p2pify.com/6ccb59439e24368ad52f37d36822b671`,
+      url: `https://nd-789-768-054.p2pify.com/${process.env.NODE_API_KEY}`,
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : []
     }
   },

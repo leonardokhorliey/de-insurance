@@ -153,8 +153,8 @@ function App() {
 
   const getUserType = async (verifierContract, tokenContract, address) => {
     console.log(verifierContract);
-    // const isVerifier = await verifierContract.methods.isVerifier(address).call({from: address});
-    // console.log(isVerifier);
+    const isVerifier = await verifierContract.methods.verifiers(address).call();
+    console.log(isVerifier);
     const contractOwner = await tokenContract.methods.owner().call();
     const isOwner = contractOwner === address;
     
