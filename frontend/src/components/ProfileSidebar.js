@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { AppContext } from "../context";
 
 const ProfileSidebar = ({setSelectedSidebarOption, disconnectWallet}) => {
-
-    const [selectedOption, setSelectedOption] = useState(1);
 
     const sideBarOptions = [
         {
@@ -33,6 +32,10 @@ const ProfileSidebar = ({setSelectedSidebarOption, disconnectWallet}) => {
         }
     ]
 
+    const [selectedOption, setSelectedOption] = useState(1);
+    const { userType } = useContext(AppContext)
+    const [availableSidebar, setAvailableSidebar] = useState(sideBarOptions.slice(0, 2))
+
 
     const setSidebarOption = (optionId) => {
 
@@ -42,18 +45,31 @@ const ProfileSidebar = ({setSelectedSidebarOption, disconnectWallet}) => {
         setSelectedSidebarOption(selected);
     }
 
+    useEffect(() => {
+        if (userType === 'verifier') {
+            setAvailableSidebar(sideBarOptions.slice(2, 4))
+            setSidebarOption(3)
+        } else if (userType === 'owner') {
+            setAvailableSidebar(sideBarOptions.slice(2, 5))
+            setSidebarOption(3)
+        } else {
+            setAvailableSidebar(sideBarOptions.slice(0, 2))
+        }
+        
+    }, [userType])
+
     return (
         <aside id="sidebar">
-            <div class="sidebar-list">
+            <div className="sidebar-list">
                 <div>
                     <h1>
                         De-Insure
                     </h1>
                 </div>
-                <div class="sidebar-options">
+                <div className="sidebar-options">
 
                     {
-                        sideBarOptions.map(opt => {
+                        availableSidebar.map(opt => {
                             return <button key ={opt.id} style= {{backgroundColor: selectedOption != opt.id && 'transparent'}} onClick={() => setSidebarOption(opt.id)}>
                                 {
                                     opt.key === 'available-packages' ? 

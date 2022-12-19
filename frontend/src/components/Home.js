@@ -1,10 +1,8 @@
 import { Link } from "react-router-dom"
 import { FaAngleDoubleRight, FaQuoteLeft, FaQuoteRight } from 'react-icons/fa';
-import { useState } from "react";
-import Packages from "./Packages";
 import PackageList from "./PackageList";
 
-const Home = ({packages}) => {
+const Home = () => {
 
     return (
         <>
@@ -16,7 +14,7 @@ const Home = ({packages}) => {
                     </h1>
 
                 </div>
-                <div class="floating-box">
+                <div className="floating-box">
                     <FaQuoteLeft />
                     <em>
                         De-Insure provides a valuable pool of verifiers, to ensure validity of Insurance claims.
@@ -26,7 +24,7 @@ const Home = ({packages}) => {
                 </div>
             </section>
 
-            <PackageList packages={packages} isHomePage={true}/>
+            <PackageList isHomePage={true}/>
         </>
     )
 }

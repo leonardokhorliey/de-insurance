@@ -1,6 +1,10 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
+import { VerifierContext } from "../context/VerifierContext"
+import { Link } from "react-router-dom"
 
-const AdminView = ({pendingVerifiers}) => {
+const AdminView = () => {
+
+    const { pendingVerifiers, blacklistVerifier } = useContext(VerifierContext)
 
     const [claims, setClaims] = useState([{
         address: '0xfffffff',
@@ -57,16 +61,16 @@ const AdminView = ({pendingVerifiers}) => {
                         </th>
                     </tr>
                     {
-                        claims.map((verifier, idx) => 
+                        pendingVerifiers.map((verifier, idx) => 
                             <tr>
                                 <td>
                                     {idx + 1}
                                 </td>
                                 <td>
-                                    {verifier.address}
+                                    {`${verifier.address.substring(0, 10)}...`}
                                 </td>
                                 <td>
-                                    {verifier.docsURI}
+                                    <Link style={{ textDecoration: 'none', fontFamily: 'Montserrat', fontWeight: 300 }} to= "/">{verifier.docsURI}</Link>
                                 </td>
                                 <td>
                                     {verifier.contribution}
@@ -75,7 +79,7 @@ const AdminView = ({pendingVerifiers}) => {
                                     {verifier.createdAt}
                                 </td>
                                 <td>
-                                    <div>
+                                    <div id="table-action">
                                         <button>
                                             Verify
                                         </button>

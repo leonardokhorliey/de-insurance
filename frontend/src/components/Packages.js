@@ -1,7 +1,13 @@
+import { useContext } from "react"
+import { TokenContext } from "../context/TokenContext"
 import Package from "./Package"
 
 
-const Packages = ({packages}) => {
+const Packages = () => {
+
+    const { packages } = useContext(TokenContext)
+
+    console.log(packages);
 
     return (
         <div id="package-list">

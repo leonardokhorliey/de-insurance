@@ -2,9 +2,13 @@
 import { Link } from "react-router-dom";
 import { FaAngleDoubleRight } from "react-icons/fa";
 import Packages from "./Packages";
+import { useContext } from "react";
+import { InsuranceContext } from "../context/InsuranceContext";
+import { TokenContext } from "../context/TokenContext";
 
 
-const PackageList = ({packages, isHomePage}) => {
+const PackageList = ({isHomePage}) => {
+
 
 
     return (
@@ -19,7 +23,7 @@ const PackageList = ({packages, isHomePage}) => {
                         </button>}
                     </div>
 
-                    <Packages packages = {packages}/>
+                    <Packages />
                 </div>
             </section>
         

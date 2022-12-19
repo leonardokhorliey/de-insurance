@@ -16,9 +16,9 @@ async function main() {
 
   // We get the contract to deploy
   console.log("Hi")
-  const dataForCode = await uploadImage('code.png', true);
+  const dataForCode = await uploadImage('code.png', true, 'Comprehensive Vehicle Insurance', 'Insure your vehicle with a full comprehensive insurance', '9.00');
   console.log("Yo")
-  const dataForPic = await uploadImage('pic.png', false);
+  const dataForPic = await uploadImage('pic.png', false, '3rd-Party Vehicle Insurance', 'Save the time for the delay. Let\'s cover you when you make mistakes.', '15.28');
 
   const jsonData1 = await uploadToIpfs([
     {

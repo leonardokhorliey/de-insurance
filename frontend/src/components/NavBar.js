@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom"
+import { useContext } from "react";
+import { AppContext } from "../context";
 
 
 
-const NavBar = ({address, balance, signedIn, connectWallet}) => {
-    
+const NavBar = () => {
+    const { selectedAccount, ethBalance, connectWallet } = useContext(AppContext);
 
 
     return (
@@ -33,13 +35,13 @@ const NavBar = ({address, balance, signedIn, connectWallet}) => {
 
                     </nav>
 
-                    {signedIn ? <div id="account">
+                    {selectedAccount ? <div id="account">
                         
                         <h2>
-                            {address}
+                            {`${selectedAccount.substring(0, 25)}...`}
                         </h2>
                         <p>
-                            {`${balance} tBNB`}
+                            {`${ethBalance} tBNB`}
                         </p>
                     </div>: 
 

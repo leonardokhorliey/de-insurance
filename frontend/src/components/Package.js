@@ -14,7 +14,7 @@ const Package = ({pkg}) => {
                     {pkg.description}
                 </p>
                 <button id="package-cta">
-                    <Link style={{ textDecoration: 'none', fontFamily: 'Montserrat', fontWeight: 300, color: 'white' }} to={`/packages/${pkg.id}`}>See More </Link>
+                    <Link style={{ textDecoration: 'none', fontFamily: 'Montserrat', fontWeight: 300, color: 'white' }} to={`/packages/${pkg.tokenId}`}>See More </Link>
                     
                 </button>
             </div>

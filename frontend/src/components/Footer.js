@@ -18,7 +18,7 @@ const Footer = () => {
                         <Link style={{ textDecoration: 'none', fontFamily: 'Montserrat', fontWeight: 300, color: 'white' }} to="/docs">Docs</Link>
                     </div>
                     <div>
-                        <Link style={{ textDecoration: 'none', fontFamily: 'Montserrat', fontWeight: 300, color: 'white' }} to="/verifier">Become a verifier</Link>
+                        <Link style={{ textDecoration: 'none', fontFamily: 'Montserrat', fontWeight: 300, color: 'white' }} to="/verifier/register">Become a verifier</Link>
                         <Link style={{ textDecoration: 'none', fontFamily: 'Montserrat', fontWeight: 300, color: 'white' }} to="https://github.com/leonardokhorliey/de-insurance">Source Code</Link>
                     </div>
                 </div>

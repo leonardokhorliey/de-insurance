@@ -3,7 +3,7 @@ pragma solidity ^0.8.6;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./USDTInterface.sol";
-
+import "./InsurancePool.sol";
 
 contract Verifier is Ownable {
 
@@ -12,7 +12,9 @@ contract Verifier is Ownable {
     struct VerifierApplication {
         address user;
         string supportingDocsURI;
+        uint256 contributionAmount;
         uint status;
+        address creator;
     }
 
     uint public verifierCount;
@@ -32,6 +34,7 @@ contract Verifier is Ownable {
 
     constructor(address usdtAddress) {
         usdtContract = USDTInterface(usdtAddress);
+        verifierSignUpOpen= true;
     }
 
     function setPoolAddress(address _poolAddress) public onlyOwner {
@@ -41,11 +44,12 @@ contract Verifier is Ownable {
     }
 
     function registerAsVerifier(string memory profileDocURI, uint contributionAmount) public {
+        require(verifierSignUpOpen, "Unauthorized at this time");
         require(enrolledAsVerifier(msg.sender) == -1, "Previously attempted enroll as verifier");
 
         usdtContract.transfer(poolAddress, contributionAmount);
 
-        verifierApplications.push(VerifierApplication(msg.sender, profileDocURI, 0));
+        verifierApplications.push(VerifierApplication(msg.sender, profileDocURI, contributionAmount, 0, msg.sender));
     }
 
     function isVerifier(address addr_) public view returns (bool) {
@@ -86,10 +90,56 @@ contract Verifier is Ownable {
         int applicationIndex = enrolledAsVerifier(_verifier);
 
         verifiers[_verifier] = false;
-        verifierApplications[uint256(applicationIndex)].status = 2;
+        verifierApplications[uint256(applicationIndex)].status = 3;
         verifierCount -= 1;
         blackListedVerifiers[_verifier] = true;
         emit BlacklistVerifier(_verifier);
+    }
+
+    function closeVerifierSignUpPeriod() public onlyOwner {
+        require(verifierSignUpOpen, "Already closed");
+        verifierSignUpOpen = false;
+    }
+
+    function openVerifierSignUpPeriod() public onlyOwner {
+        require(!verifierSignUpOpen, "Already open");
+        verifierSignUpOpen = true;
+    }
+
+    function whitelistVerifier(address verifier) public onlyOwner {
+        verifierApplications.push(VerifierApplication(verifier, "", 0, 1, owner()));
+
+        verifiers[verifier] = true;
+    }
+    
+
+    function getVerifierReward(address _verifier) public view returns (uint256 reward) {
+
+        uint currentVerifierActionCount = 0;
+        uint currentVerifierContribution = 0;
+        uint totalContribution = 0;
+        uint totalActionCount = 0;
+
+        for (uint i; i < verifierApplications.length; i++) {
+            if (verifierApplications[i].status == 1) {
+
+                uint actionCount = InsurancePool(poolAddress).verifierActionCount(verifierApplications[i].user);
+                uint contribution = verifierApplications[i].contributionAmount;
+                if (verifierApplications[i].user == _verifier) {
+
+                    currentVerifierActionCount = actionCount;
+                    currentVerifierContribution = contribution;
+                }
+
+                totalContribution += contribution;
+
+                totalActionCount = actionCount;
+            }
+        }
+
+        uint ratio = currentVerifierActionCount * currentVerifierContribution * 1e18 /(totalActionCount * totalContribution);
+
+        reward = ratio * totalContribution / 1e18;
     }
 
     function getPendingVerifierAplications() public view returns (VerifierApplication[] memory pending) {
@@ -108,6 +158,13 @@ contract Verifier is Ownable {
             }
         }
     }
+
+    function getVerifiers() public view returns (VerifierApplication[] memory) {
+
+        return verifierApplications;
+    }
+
+
 
 
 

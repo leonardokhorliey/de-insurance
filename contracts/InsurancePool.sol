@@ -27,7 +27,7 @@ contract InsurancePool {
     mapping(uint256 => RegistrationVerifiers) registrationVerifiers;
     mapping(uint256 => ClaimVerifiers) claimVerifiers; 
     mapping(address => uint256) public verifierActionCount;
-    mapping(address => mapping(bytes => uint256)) contributionPoolAmounts;
+    uint256 public contributionPoolAmounts;
     mapping(address => Registration[]) public userToRegistration;
     mapping(address => Claim[]) public userToClaim;
 
@@ -64,46 +64,6 @@ contract InsurancePool {
         usdtContract = USDTInterface(_usdtAddress);
         verifierContract = Verifier(verifierContractAddress);
         tokenContract = DeInsureToken(_tokenContractAddress);
-    }
-
-    function hasCheckedReg(address verifier, uint256 _registrationId)
-        public
-        view
-        returns (bool)
-    {
-        RegistrationVerifiers memory verifiers = registrationVerifiers[
-            _registrationId
-        ];
-
-        for (uint256 i = 0; i < verifiers.approvers.length; i++) {
-            if (verifiers.approvers[i].verifier == verifier) return true;
-        }
-
-        for (uint256 i = 0; i < verifiers.decliners.length; i++) {
-            if (verifiers.decliners[i] == verifier) return true;
-        }
-
-        return false;
-    }
-
-    function hasCheckedClaim(address verifier, uint256 _claimId)
-        public
-        view
-        returns (bool)
-    {
-        ClaimVerifiers memory verifiers = claimVerifiers[
-            _claimId
-        ];
-
-        for (uint256 i = 0; i < verifiers.approvers.length; i++) {
-            if (verifiers.approvers[i] == verifier) return true;
-        }
-
-        for (uint256 i = 0; i < verifiers.decliners.length; i++) {
-            if (verifiers.decliners[i] == verifier) return true;
-        }
-
-        return false;
     }
 
     function registerForInsurance(
@@ -270,6 +230,7 @@ contract InsurancePool {
         uint256 _amount,
         uint256 tokenType
     ) external {
+        
         uint balanceOfToken = tokenContract.balanceOf(msg.sender, tokenType);
         uint exceedings = tokenContract.exceedingAmounts(msg.sender, tokenType);
         //Check the balance for the tokenType specified
@@ -311,6 +272,46 @@ contract InsurancePool {
         require(msg.sender == address(verifierContract), "Unauthorized");
 
         usdtContract.transfer(verifier, amount);
+    }
+
+    function hasCheckedReg(address verifier, uint256 _registrationId)
+        public
+        view
+        returns (bool)
+    {
+        RegistrationVerifiers memory verifiers = registrationVerifiers[
+            _registrationId
+        ];
+
+        for (uint256 i = 0; i < verifiers.approvers.length; i++) {
+            if (verifiers.approvers[i].verifier == verifier) return true;
+        }
+
+        for (uint256 i = 0; i < verifiers.decliners.length; i++) {
+            if (verifiers.decliners[i] == verifier) return true;
+        }
+
+        return false;
+    }
+
+    function hasCheckedClaim(address verifier, uint256 _claimId)
+        public
+        view
+        returns (bool)
+    {
+        ClaimVerifiers memory verifiers = claimVerifiers[
+            _claimId
+        ];
+
+        for (uint256 i = 0; i < verifiers.approvers.length; i++) {
+            if (verifiers.approvers[i] == verifier) return true;
+        }
+
+        for (uint256 i = 0; i < verifiers.decliners.length; i++) {
+            if (verifiers.decliners[i] == verifier) return true;
+        }
+
+        return false;
     }
 
 

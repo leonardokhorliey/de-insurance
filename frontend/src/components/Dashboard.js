@@ -1,7 +1,15 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AppContext } from "../context";
+import { InsuranceContext } from "../context/InsuranceContext";
+import { USDTContext } from "../context/USDTContext";
 
 
-const Dashboard = ({balances, packagesEnrolled, claimsMade, address}) => {
+const Dashboard = () => {
+
+    const { ethBalance, selectedAccount } = useContext(AppContext)
+    const { usdtBalance } = useContext(USDTContext)
+    const { packagesEnrolled, claimsMade } = useContext(InsuranceContext)
+
 
     const [claims, setClaims] = useState([{
         name: 'Package',
@@ -34,15 +42,15 @@ const Dashboard = ({balances, packagesEnrolled, claimsMade, address}) => {
                         BNB Balance
                     </h3>
                     <p>
-                        {balances.eth}
+                        {ethBalance}
                     </p>
                 </div>
-                <div class="balance-box">
+                <div className="balance-box">
                     <h3>
                         USDT Balance
                     </h3>
                     <p>
-                        {balances.usdt}
+                        {usdtBalance}
                     </p>
                 </div>
             </div>
@@ -72,7 +80,7 @@ const Dashboard = ({balances, packagesEnrolled, claimsMade, address}) => {
                         </th>
                     </tr>
                     {
-                        claims.map((claim, idx) => 
+                        claimsMade.map((claim, idx) => 
                             <tr key={idx}>
                                 <td>
                                     {idx + 1}
@@ -103,7 +111,7 @@ const Dashboard = ({balances, packagesEnrolled, claimsMade, address}) => {
                 </h3>
                 <div style={{width: '100%'}}>
                     {
-                        pkgs.map((pkg, idx) => 
+                        packagesEnrolled.map((pkg, idx) => 
                             <div key={idx} className="pkg-item">
                                 <div>
                                     <h2>

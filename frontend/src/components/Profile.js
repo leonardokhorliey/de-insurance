@@ -1,42 +1,53 @@
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
+import { AppContext } from "../context";
+import { InsuranceContext } from "../context/InsuranceContext";
+import { USDTContext } from "../context/USDTContext";
 import AdminView from "./AdminView"
+import ApproveModal from "./ApproveModal";
 import Dashboard from "./Dashboard";
+import PendingClaims from "./PendingClaims";
+import PendingRegs from "./PendingRegs";
 import ProfileSidebar from "./ProfileSidebar";
 
 
-const Profile = ({address, balances, packagesEnrolled, claimsMade, disconnectWallet}) => {
+const Profile = () => {
 
     const [currentPageKey, setCurrentPageKey] = useState('dashboard');
-    const [address_, setAddress] = useState('')
+    const [approveModalSet, setApproveModalSet] = useState(false)
+    const [entityId, setEntityId] = useState('')
+    const [action, setAction] = useState("")
+    const { disconnectWallet, ethBalance, selectedAccount } = useContext(AppContext)
+    
+    const setApproveData = (entityId, action) => {
+        setEntityId(entityId)
+        setAction(action)
+        setApproveModalSet(true)
+    }
 
     const mapping = {
         'admin': <AdminView pendingVerifiers/>,
-        'dashboard': <Dashboard balances={balances} packagesEnrolled claimsMade address= {address_}/>
+        'dashboard': <Dashboard address= {selectedAccount}/>,
+        'pending-reg': <PendingRegs setApproveData = {setApproveData}/>,
+        'pending-claim': <PendingClaims setApproveData = {setApproveData}/>
     }
 
     const setSelectedSidebar = (key) => {
         setCurrentPageKey(key);
-
-
     }
 
-    useEffect(() => {
-        setAddress(`${address.substring(0, 25)}...`);
-    }, [address])
-
-
     return (
-
+        <>
+        {approveModalSet && <ApproveModal closeModal= {() => setApproveModalSet(false)} action={action} entityId={entityId} />}
 
         <div id="profile">
             <ProfileSidebar setSelectedSidebarOption={setSelectedSidebar} disconnectWallet={disconnectWallet}/>
-            <div class="profile-page">
-                <div class="intro-area">
+            <div className="profile-page">
+                <div className="intro-area">
                     <h3 className="text-heading">Hello, chief</h3>
                     <div id="account">
                             
                         <h2>
-                            {address_}
+                            {`${selectedAccount.substring(0, 20)}...`}
                         </h2>
                     </div>
                 </div>
@@ -44,6 +55,7 @@ const Profile = ({address, balances, packagesEnrolled, claimsMade, disconnectWal
             </div>
             
         </div>
+        </>
     )
 }
 

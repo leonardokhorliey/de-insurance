@@ -25,7 +25,7 @@ export const uploadToIpfs= async (content: any[], restart: boolean) => {
 
 }
 
-export const uploadImage = async (imagePath: string, restart: boolean) => {
+export const uploadImage = async (imagePath: string, restart: boolean, name: string, description: string, premiumPercentage: string) => {
     const file = fs.readFileSync(`/Users/ebube/Desktop/CodeWorks/Projects/de-insurance/images/${imagePath}`, {encoding: 'base64'});
 
 
@@ -40,8 +40,9 @@ export const uploadImage = async (imagePath: string, restart: boolean) => {
     console.log("Bye")
 
     const dataForJson = {
-        name: imagePath.replace('.png', ''),
-        description: "Insurance package for the Name",
+        name,
+        description,
+        premiumPercentage,
         img: returnResponse[0].path
     }
 

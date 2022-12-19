@@ -111,7 +111,7 @@ export const InsuranceProvider = ({children}) => {
 
             const registrations = regs.map((reg, idx) => ({
                 id: idx,
-                tokenId: reg.tokenType,
+                tokenId: reg.tokenType.toString(),
                 uri: reg.docsURI,
                 user: reg.user,
                 valuationAmount: reg.valuationAmount,
@@ -135,7 +135,7 @@ export const InsuranceProvider = ({children}) => {
 
             const claims = claimsRes.map((reg, idx) => ({
                 id: idx,
-                tokenId: reg.tokenType,
+                tokenId: reg.tokenType.toString(),
                 uri: reg.docsURI,
                 user: reg.user,
                 amount: reg.amount,
@@ -243,7 +243,7 @@ export const InsuranceProvider = ({children}) => {
 
         const status = await insuranceContract.enrolmentStatus(userAddress, tokenId);
 
-        return status.toString() === '1'
+        return status === '1'
     }
 
     const getUncheckedRegs = async (address) => {
