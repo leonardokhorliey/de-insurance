@@ -15,22 +15,26 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
+  console.log("Hi")
+  const dataForCode = await uploadImage('code.png', true);
+  console.log("Yo")
+  const dataForPic = await uploadImage('pic.png', false);
 
-  const dataForCode = await uploadImage('code.png');
-  const dataForPic = await uploadImage('pic.png');
-
-  const jsonData = await uploadToIpfs([
+  const jsonData1 = await uploadToIpfs([
     {
       path: `2.json`,
       content: dataForCode
     },
+  ], false);
+
+  const jsonData2 = await uploadToIpfs([
     {
       path: `3.json`,
       content: dataForPic
-    },
-  ]);
+    }
+  ], false)
 
-  const ipfsUrl = jsonData[0].path.replace('/2.json', '');
+  const ipfsUrl = jsonData1[0].path.replace('/2.json', '');
 
   console.log(ipfsUrl);
 
@@ -43,12 +47,12 @@ async function main() {
   console.log("Token deployed to:", mockUSDT.address);
 
   const Token = await ethers.getContractFactory("DeInsureToken");
-  const token = await Token.deploy(ipfsUrl);
+  const token = await Token.deploy();
 
   await token.deployed();
 
-  await token.createNewToken('2', '900');
-  await token.createNewToken('3', '1528');
+  await token.createNewPackage('900', jsonData1[0].path);
+  await token.createNewPackage('1528', jsonData2[0].path);
 
   console.log("Token deployed to:", token.address);
 

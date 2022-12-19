@@ -2,6 +2,7 @@ import { Link } from "react-router-dom"
 import { FaAngleDoubleRight, FaQuoteLeft, FaQuoteRight } from 'react-icons/fa';
 import { useState } from "react";
 import Packages from "./Packages";
+import PackageList from "./PackageList";
 
 const Home = ({packages}) => {
 
@@ -25,20 +26,7 @@ const Home = ({packages}) => {
                 </div>
             </section>
 
-            <section id="packages">
-                <div>
-                    <div id="packages-header">
-                        <h2>
-                            Available Packages
-                        </h2>
-                        <button>
-                            <Link style={{ textDecoration: 'none', fontFamily: 'Montserrat', fontWeight: 300, color: 'white' }} to="/packages">See all <FaAngleDoubleRight/></Link>
-                        </button>
-                    </div>
-
-                    <Packages packages = {packages}/>
-                </div>
-            </section>
+            <PackageList packages={packages} isHomePage={true}/>
         </>
     )
 }

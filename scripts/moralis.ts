@@ -1,4 +1,3 @@
-
 import * as moralis from "moralis";
 import fs from "fs";
 // import * as ipfsClient from "ipfs-http-client";
@@ -11,8 +10,8 @@ console.log(process.env.MORALIS_API_KEY);
 // const client = create(`${process.env.IPFS_URL}`);
 
 
-export const uploadToIpfs= async (content: any[]) => {
-    await Moralis.start({
+export const uploadToIpfs= async (content: any[], restart: boolean) => {
+    if (restart) await Moralis.start({
         apiKey: process.env.MORALIS_API_KEY
     });
 
@@ -26,25 +25,26 @@ export const uploadToIpfs= async (content: any[]) => {
 
 }
 
-export const uploadImage = async (imagePath: string) => {
+export const uploadImage = async (imagePath: string, restart: boolean) => {
     const file = fs.readFileSync(`/Users/ebube/Desktop/CodeWorks/Projects/de-insurance/images/${imagePath}`, {encoding: 'base64'});
+
+
 
     const data = {
         path: imagePath,
         content: file
     }
 
-    const returnResponse = await uploadToIpfs([data]);
+    console.log("Yoyo");
+    const returnResponse = await uploadToIpfs([data], restart);
+    console.log("Bye")
 
     const dataForJson = {
         name: imagePath.replace('.png', ''),
-        description: "A picture for Token",
+        description: "Insurance package for the Name",
         img: returnResponse[0].path
     }
 
     return dataForJson;
 
 }
-
-
-

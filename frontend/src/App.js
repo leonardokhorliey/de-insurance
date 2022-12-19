@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import './App.css';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './components/Home';
 import PackageDetail from './components/PackageDetail';
@@ -10,21 +10,24 @@ import Web3 from 'web3/dist/web3.min.js';
 // import * as dotenv from "dotenv";
 import TokenContract from './abis/Token.json';
 import VerifierContract from './abis/Verifier.json';
+import ERC20Contract from './abis/ERC20Mock.json';
 import InsuranceContract from './abis/Insurance.json';
 import convertToEther from './helpers/convertToEther';
-import uploadToIpfs from './helpers/moralis';
+import PackageList from './components/PackageList';
 
 // dotenv.config()
 
 const contractAddresses = {
   tokenContract: process.env.REACT_APP_PUBLIC_TOKEN_CONTRACT_ADDRESS,
   verifierContract: process.env.REACT_APP_PUBLIC_VERIFIER_CONTRACT_ADDRESS,
-  insuranceContract: process.env.REACT_APP_PUBLIC_INSURANCE_CONTRACT_ADDRESS
+  insuranceContract: process.env.REACT_APP_PUBLIC_INSURANCE_CONTRACT_ADDRESS,
+  erc20Contract: process.env.REACT_APP_PUBLIC_USDT_CONTRACT_ADDRESS
 }
 
 console.log(contractAddresses);
 
 function App() {
+  const navigate = useNavigate();
 
   const [loaded, setLoaded] = useState(0);
   const [isSignedIn, setIsSignedIn] = useState(false);
@@ -35,6 +38,7 @@ function App() {
   const [insuranceContract, setInsuranceContract] = useState({});
   const [web3, setWeb3] = useState();
   const [balance, setBalance] = useState();
+  const [USDTBalance, setUSDTBalance] = useState();
 
   const [packages, setPackages] = useState([
     {
@@ -97,19 +101,23 @@ function App() {
         setInitialConfigurations(web3, accounts[0])
       });
 
-      
-
     }
     
   };
 
+  const disconnectWallet = () => {
+    localStorage.removeItem('activeAccount');
+    navigate('/');
+
+  }
+
 
   useEffect(() => {
     const activeAccount = localStorage.getItem('activeAccount');
-    // if (activeAccount) {
-    //   setIsSignedIn(true);
-    //   return;
-    // }
+    if (activeAccount) {
+      connectWallet();
+      return;
+    }
 
     // init();
   }, [])
@@ -130,6 +138,11 @@ function App() {
       contractAddresses.tokenContract
     );
 
+    const erc20Contract = new web3.eth.Contract(
+      ERC20Contract.abi,
+      contractAddresses.erc20Contract
+    );
+
 
     setTokenContract(tokenContract);
 
@@ -137,7 +150,8 @@ function App() {
 
     setInsuranceContract(insuranceContract);
     await getNativeChainBalance(web3, address);
-    await getUserType(verifierContract, tokenContract, address);
+    setUSDTBalance(convertToEther(web3, await erc20Contract.methods.balanceOf(address).call()));
+    // await getUserType(verifierContract, tokenContract, address);
     await getPackageTypes(tokenContract);
   }
 
@@ -193,7 +207,7 @@ function App() {
 
   }
 
-  const registerForInsurance = async(tokenType, docsURI, valuation) => {
+  const registerForInsurance = async(docsURI, tokenType, valuation) => {
     try {
       await insuranceContract.methods.registerForInsurance(docsURI, tokenType, (valuation*100000000).toString()).send({from: selectedAccount});
       alert("Registered successfully. Wait for approval now");
@@ -216,10 +230,14 @@ function App() {
         <Layout children={home} signedIn={isSignedIn} connectWallet={() => connectWallet()} balance={balance} address={selectedAccount}/>
       } />
       <Route path= "/profile" element = {
-        <Profile address={selectedAccount}/>
+        <Profile address={selectedAccount} balances = {{eth: balance, usdt: USDTBalance}} disconnectWallet={disconnectWallet}/>
       } />
       <Route path= "/packages/:packageType" element = {
         <PackageDetail packages={packages} signedIn={isSignedIn} connectWallet={() => connectWallet()} balance={balance} address={selectedAccount} setUploadedDocsURI={registerForInsurance} />
+      } />
+      <Route path= "/packages" element = {
+        <Layout children={<PackageList packages= {packages}/>} signedIn={isSignedIn} connectWallet={() => connectWallet()} balance={balance} address={selectedAccount}/>
+        
       } />
     </Routes>
 

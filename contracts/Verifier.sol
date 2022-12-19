@@ -92,6 +92,22 @@ contract Verifier is Ownable {
         emit BlacklistVerifier(_verifier);
     }
 
+    function getPendingVerifierAplications() public view returns (VerifierApplication[] memory pending) {
+
+        VerifierApplication[] memory potentialVerifiers = verifierApplications;
+
+        pending = new VerifierApplication[](verifierApplications.length - verifierCount);
+
+        uint256 index = 0;
+
+        for (uint256 i = 0; i < potentialVerifiers.length; i++) {
+            if (potentialVerifiers[i].status == 0) {
+
+                pending[index] = potentialVerifiers[i];
+                index += 1;
+            }
+        }
+    }
 
 
 

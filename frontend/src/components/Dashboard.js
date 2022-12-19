@@ -34,7 +34,7 @@ const Dashboard = ({balances, packagesEnrolled, claimsMade, address}) => {
                         BNB Balance
                     </h3>
                     <p>
-                        {balance.eth}
+                        {balances.eth}
                     </p>
                 </div>
                 <div class="balance-box">
@@ -42,7 +42,7 @@ const Dashboard = ({balances, packagesEnrolled, claimsMade, address}) => {
                         USDT Balance
                     </h3>
                     <p>
-                        {balance.usdt}
+                        {balances.usdt}
                     </p>
                 </div>
             </div>
@@ -73,7 +73,7 @@ const Dashboard = ({balances, packagesEnrolled, claimsMade, address}) => {
                     </tr>
                     {
                         claims.map((claim, idx) => 
-                            <tr>
+                            <tr key={idx}>
                                 <td>
                                     {idx + 1}
                                 </td>
@@ -103,8 +103,8 @@ const Dashboard = ({balances, packagesEnrolled, claimsMade, address}) => {
                 </h3>
                 <div style={{width: '100%'}}>
                     {
-                        pkgs.map(pkg => 
-                            <div className="pkg-item">
+                        pkgs.map((pkg, idx) => 
+                            <div key={idx} className="pkg-item">
                                 <div>
                                     <h2>
                                         {pkg.name}

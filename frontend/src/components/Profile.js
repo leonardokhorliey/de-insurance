@@ -4,14 +4,14 @@ import Dashboard from "./Dashboard";
 import ProfileSidebar from "./ProfileSidebar";
 
 
-const Profile = ({address}) => {
+const Profile = ({address, balances, packagesEnrolled, claimsMade, disconnectWallet}) => {
 
     const [currentPageKey, setCurrentPageKey] = useState('dashboard');
     const [address_, setAddress] = useState('')
 
     const mapping = {
         'admin': <AdminView pendingVerifiers/>,
-        'dashboard': <Dashboard balances packagesEnrolled claimsMade address= {address_}/>
+        'dashboard': <Dashboard balances={balances} packagesEnrolled claimsMade address= {address_}/>
     }
 
     const setSelectedSidebar = (key) => {
@@ -29,7 +29,7 @@ const Profile = ({address}) => {
 
 
         <div id="profile">
-            <ProfileSidebar setSelectedSidebarOption={setSelectedSidebar}/>
+            <ProfileSidebar setSelectedSidebarOption={setSelectedSidebar} disconnectWallet={disconnectWallet}/>
             <div class="profile-page">
                 <div class="intro-area">
                     <h3 className="text-heading">Hello, chief</h3>

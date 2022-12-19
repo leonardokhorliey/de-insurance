@@ -12,6 +12,9 @@ contract DeInsureToken is ERC1155, Ownable {
         uint premiumPercentage;
     }
 
+    mapping (uint => string) public tokenURIs;
+    uint private tokenCounter;
+
     PackageType[] public tokenTypes;
     address public poolAddress;
 
@@ -23,16 +26,27 @@ contract DeInsureToken is ERC1155, Ownable {
     // maps user to claims beyond contributions based on tokenType
     mapping (address => mapping(uint => uint)) public exceedingAmounts;
 
-    constructor(string memory ipfsDirectory) ERC1155(string(abi.encodePacked(ipfsDirectory, "/{id}.sol"))) {
-    
+    constructor() ERC1155("") {
+        tokenCounter = 0;
+    }
+
+    function uri(uint256 tokenId) public view virtual override returns (string memory) {
+        return tokenURIs[tokenId];
     }
 
 
     // defines the monthly premium percentage as a 4-digit number (fraction * 10000)
-    function createNewToken(uint _tokenCode, uint _premiumPercentage) public onlyOwner {
+    function createNewPackage(uint _premiumPercentage, string memory tokenURI) public onlyOwner {
+        
+        uint _tokenCode = tokenCounter + 1;
+
+        require(abi.encodePacked(tokenURIs[_tokenCode]).length == 0, "Already set URI for this package");
+        tokenURIs[_tokenCode] = tokenURI;
         _mint(msg.sender, _tokenCode, 1, "");
 
         tokenTypes.push(PackageType(_tokenCode, _premiumPercentage));
+
+        tokenCounter = _tokenCode;
     }
 
     function isTokenType(uint _tokenType) public view returns (bool) {
@@ -79,6 +93,8 @@ contract DeInsureToken is ERC1155, Ownable {
 
         _burn(client, _tokenId, _amount);
     }
+
+
 
     
 }

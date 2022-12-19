@@ -16,11 +16,6 @@ const PackageDetail = ({packages, address, balance, connectWallet, signedIn, set
         identity: "",
         image: "",
         supportingDocs: [
-            {
-                id: 1,
-                description: "",
-                image: ""
-            }
         ]
     });
 
@@ -53,7 +48,7 @@ const PackageDetail = ({packages, address, balance, connectWallet, signedIn, set
         // console.log(packages);
         // console.log(packages.filter(pkg => pkg.id == packageType))
         setPkg(packages.filter(pkg => pkg.id == packageType)[0]);
-    }, [packages])
+    }, [packages, packageType])
 
     const updateDocs = (id, newValue, key) => {
         const copyOfDocs = JSON.parse(JSON.stringify(docs));
@@ -89,7 +84,7 @@ const PackageDetail = ({packages, address, balance, connectWallet, signedIn, set
 
     const uploadImagestoIpfs = async () => {
 
-
+        
         // images.forEach(img => {
         //     let content = {} ;
         //     content.path= `${img.file.name}.json`;
@@ -102,6 +97,8 @@ const PackageDetail = ({packages, address, balance, connectWallet, signedIn, set
             content : img.file
         }))
 
+        console.log(files);
+
         
 
         const data = await uploadToIpfs(files);
@@ -111,19 +108,44 @@ const PackageDetail = ({packages, address, balance, connectWallet, signedIn, set
     const uploadDocsURI = async () => {
         const uploadedImgs = await uploadImagestoIpfs();
         
+        console.log(uploadedImgs);
         let data;
         uploadedImgs.forEach(async (item, idx) => {
-            if (idx === 0) setipfsObject(prev => {return {...prev, image: uploadedImgs[0].path}});
+            if (idx === 0) {
+                setipfsObject(prev => {return {...prev, image: item.path}});
+                return;
+            }
+
+            // supportingDocs = ipfsObject.supportingDocs
 
             setipfsObject(prev => {
-                prev.supportingDocs[idx - 1].image = uploadedImgs[0].path
+                let supportingDocs = [...prev.supportingDocs, {
+                    id: idx,
+                    description: docs[idx - 1].description,
+                    image: item.path
+                }];
+
+                prev.supportingDocs = supportingDocs;
+
+                console.log(prev);
 
                 return prev;
             });
 
-            if (idx === uploadedImgs.length - 1) data = await uploadToIpfs([ipfsObject]);
+            if (idx === uploadedImgs.length - 1) {
 
-            setUploadedDocsURI(data[0].path, packageType, valuation);
+                setTimeout(async () => {
+                    console.log(ipfsObject);
+                    data = await uploadToIpfs([{path: `${address.substring(0, 10)}-${packageType}.json`, content: ipfsObject}]);
+                    
+                    console.log(data[0].path);
+                    setUploadedDocsURI(data[0].path, packageType, valuation);
+                }, 4000);
+                
+
+            }
+
+            
 
         })
 
@@ -217,9 +239,9 @@ const PackageDetail = ({packages, address, balance, connectWallet, signedIn, set
                                         <label>Upload file</label>
                                         <input type="file" 
                                         
-                                        // onChange={(e) => {
-                                        //     setImages(prev => [...prev, {id: ele.id, name: e.target.files[0].name, file: e.target.files[0]}]);
-                                        // }}
+                                        onChange={(e) => {
+                                            setImages(prev => [...prev, {id: ele.id, name: e.target.files[0].name, file: e.target.files[0]}]);
+                                        }}
                                         />
                                     </div>
 

@@ -11,7 +11,7 @@ const uploadToIpfs= async (content) => {
         abi: content
     })
 
-
+    console.log("Here now");
     return response.result;
 
 
