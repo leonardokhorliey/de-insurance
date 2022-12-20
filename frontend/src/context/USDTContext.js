@@ -17,12 +17,13 @@ export const USDTProvider = ({children}) => {
     const [usdtBalance, setUsdtBalance] = useState()
     const [decimals, setDecimals] = useState('8')
     const [approvalDone, setApprovalDone] = useState(true)
-    const { ethereum, errorAlert, setLoading, selectedAccount } = useContext(AppContext)
+    const { ethereum, errorAlert, setLoading, selectedAccount, stableCoinConverter } = useContext(AppContext)
 
     const approveContractForAmount = async (addressToApprove, amount) => {
+        amount = stableCoinConverter.convertStableCoinToBN(amount.toString(), decimals)
         setLoading(true);
         try {
-            await usdtContract.approve(addressToApprove, (amount*Number(`1e${decimals}`)).toString())
+            await usdtContract.approve(addressToApprove, amount)
         } catch (e) {
             errorAlert(e.message);
         }
@@ -33,9 +34,11 @@ export const USDTProvider = ({children}) => {
 
     const getUsdtBalance = async (address) => {
         try {
-            const balance = ethers.utils.formatEther(await usdtContract.balanceOf(address));
-            console.log("USDT ", balance)
-            setUsdtBalance(balance);
+            const balance = await usdtContract.balanceOf(address);
+            const decimals = Number(await usdtContract.decimals());
+            const bal = stableCoinConverter.convertBNToStableCoin(balance, decimals)
+            console.log("USDT ", bal)
+            setUsdtBalance(bal);
         } catch (e) {
             errorAlert(e.message);
         }
@@ -44,7 +47,7 @@ export const USDTProvider = ({children}) => {
     const getDecimals = async () => {
         try {
             const balance = await usdtContract.decimals();
-            setDecimals(balance);
+            setDecimals(Number(balance));
         } catch (e) {
             errorAlert(e.message);
         }

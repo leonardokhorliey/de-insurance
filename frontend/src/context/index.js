@@ -5,6 +5,7 @@ import { VerifierContext, VerifierProvider } from './VerifierContext';
 import { TokenContext, TokenProvider } from './TokenContext';
 import { ethers } from 'ethers';
 import { abis, contractAddresses } from '../abis';
+import stableCoinConverter from '../helpers/convertUsdt';
 
 export const AppContext = createContext();
 
@@ -90,7 +91,8 @@ export const AppContextProvider = ({children}) => {
             selectedAccount, 
             ethBalance,
             contractAddresses,
-            userType
+            userType,
+            stableCoinConverter
         }}>
             <USDTProvider>
                 <TokenProvider>

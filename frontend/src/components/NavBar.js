@@ -41,7 +41,7 @@ const NavBar = () => {
                             {`${selectedAccount.substring(0, 25)}...`}
                         </h2>
                         <p>
-                            {`${ethBalance} tBNB`}
+                            {`${ethBalance} MATIC`}
                         </p>
                     </div>: 
 

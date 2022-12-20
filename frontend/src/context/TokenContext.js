@@ -53,14 +53,14 @@ export const TokenProvider = ({children}) => {
                 console.log({
                     ...jsonData,
                     tokenId: pkg.tokenId.toString(),
-                    premiumPercentage: pkg.premiumPercentage / 10000,
+                    premiumPercentage: Number(pkg.premiumPercentage.toString()) / 10000,
                     tokenUri
                 });
 
                 pkgs.push({
                     ...jsonData,
                     tokenId: pkg.tokenId.toString(),
-                    premiumPercentage: pkg.premiumPercentage / 10000,
+                    premiumPercentage: Number(pkg.premiumPercentage.toString())  / 10000,
                     tokenUri
                 })
             }
@@ -99,7 +99,7 @@ export const TokenProvider = ({children}) => {
                 pkgs.push({
                     ...jsonData,
                     tokenId: pkg.tokenId.toString(),
-                    premiumPercentage: pkg.premiumPercentage / 10000,
+                    premiumPercentage: Number(pkg.premiumPercentage.toString())  / 10000,
                     tokenUri
                 })
             }
@@ -128,8 +128,8 @@ export const TokenProvider = ({children}) => {
 
         return {
             ...jsonData,
-            tokenId: ethers.utils.formatEther(pkg.tokenId),
-            premiumPercentage: pkg.premiumPercentage / 10000,
+            tokenId: pkg.tokenId.toString(),
+            premiumPercentage: Number(pkg.premiumPercentage.toString()) / 10000,
             tokenUri
         }     
     }

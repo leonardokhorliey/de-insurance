@@ -36,7 +36,7 @@ npx hardhat compile
 
 1. [IPFS](https://ipfs.io)
 2. [Moralis v2.7.2](https://moralis.io)
-3. [Binance Smart Chain Testnet](https://testnet/bscscan.com)
+3. [Polygon Mumbai Testnet](https://mumbai.polygonscan.com)
 
 <br>
 
@@ -46,8 +46,16 @@ Front end code is available in the `/frontend` directory. Go through the [README
 
 # Verified Contract Addresses
 
-`De-Insure Token (ERC1155)` - https://testnet.bscscan.io/address/0xFEde36aDfbb1c8EA6A3CE88960E7599ca01a328F#code
+`Sample StableCoin (USDT)` - https://mumbai.polygonscan.com/address/0x5F92394708b560383B19a69bC7dC75549EC15B41#code
 
-`Verifier Contract` - https://testnet.bscscan.io/address/0x53408c2750404b5a43dfAceF67B006a5c56c7E84#code
+`De-Insure Token (ERC1155)` - https://mumbai.polygonscan.com/address/0xAE657Be47195f0a2AC3b13c3fd1BA30A3C6234Bd#code
 
-`De-Insure Main Contract` - https://testnet.bscscan.io/address/0x5ea018db6cBD76Bac28fB3Fa492469F1523218C7#code
+`Verifier Contract` - https://mumbai.polygonscan.com/address/0x4583c30108323e03b31aC31Cc8698cF14E013952#code
+
+`De-Insure Main Contract` - https://mumbai.polygonscan.com/address/0x53408c2750404b5a43dfAceF67B006a5c56c7E84#code
+
+
+# Live URL
+
+https://de-insure-testnet.netlify.app
+

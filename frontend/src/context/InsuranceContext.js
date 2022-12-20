@@ -22,15 +22,16 @@ export const InsuranceProvider = ({children}) => {
     const [pendingClaims, setPendingClaims] = useState([])
     const [claimsMade, setClaimsMade] = useState([])
     const [claims, setClaims] = useState([])
-    const { ethereum, errorAlert, setLoading, selectedAccount } = useContext(AppContext)
+    const { ethereum, errorAlert, setLoading, selectedAccount, stableCoinConverter } = useContext(AppContext)
     const { getPackageWithTokenType } = useContext(TokenContext)
     const { decimals } = useContext(USDTContext)
 
     const registerForInsurance = async (docsURI, tokenType, valuation) => {
+        valuation = stableCoinConverter.convertStableCoinToBN(valuation, decimals)
         setLoading(true);
         try {
 
-            await insuranceContract.registerForInsurance(docsURI, tokenType, (valuation*Number(`1e${decimals}`)).toString())
+            await insuranceContract.registerForInsurance(docsURI, tokenType, valuation)
         } catch (e) {
             errorAlert(e.message);
         }
@@ -39,9 +40,10 @@ export const InsuranceProvider = ({children}) => {
     }
 
     const verifyRegistration = async (registrationId, valuation) => {
+        valuation = stableCoinConverter.convertStableCoinToBN(valuation, decimals)
         setLoading(true);
         try {
-            await insuranceContract.verifyRegistration(registrationId, (valuation*Number(`1e${decimals}`)).toString())
+            await insuranceContract.verifyRegistration(registrationId, valuation)
         } catch (e) {
             errorAlert(e.message);
         }
@@ -61,9 +63,10 @@ export const InsuranceProvider = ({children}) => {
     }
 
     const makeClaim = async (docsURI, amount, tokenType) => {
+        amount = stableCoinConverter.convertStableCoinToBN(amount, decimals)
         setLoading(true);
         try {
-            await insuranceContract.makeClaim(docsURI, (amount*Number(`1e${decimals}`)).toString(), tokenType)
+            await insuranceContract.makeClaim(docsURI, amount, tokenType)
         } catch (e) {
             errorAlert(e.message);
         }
@@ -72,9 +75,10 @@ export const InsuranceProvider = ({children}) => {
     }
 
     const payPremium = async (usdtAmount, tokenType) => {
+        usdtAmount = stableCoinConverter.convertStableCoinToBN(usdtAmount, decimals)
         setLoading(true);
         try {
-            await insuranceContract.payPremium((usdtAmount*Number(`1e${decimals}`)).toString(), tokenType)
+            await insuranceContract.payPremium(usdtAmount, tokenType)
         } catch (e) {
             errorAlert(e.message);
         }
@@ -94,9 +98,10 @@ export const InsuranceProvider = ({children}) => {
     }
 
     const payoutVerifier = async (verifier, amount) => {
+        amount = stableCoinConverter.convertStableCoinToBN(amount, decimals)
         setLoading(true);
         try {
-            await insuranceContract.payoutVerifier(verifier, (amount*Number(`1e${decimals}`)).toString())
+            await insuranceContract.payoutVerifier(verifier, amount)
         } catch (e) {
             errorAlert(e.message);
         }
@@ -114,7 +119,7 @@ export const InsuranceProvider = ({children}) => {
                 tokenId: reg.tokenType.toString(),
                 uri: reg.docsURI,
                 user: reg.user,
-                valuationAmount: reg.valuationAmount,
+                valuationAmount: stableCoinConverter.convertBNToStableCoin(reg.valuationAmount.toString(), decimals),
                 createdAt: reg.createdAt,
                 status: reg.status
 
@@ -138,7 +143,7 @@ export const InsuranceProvider = ({children}) => {
                 tokenId: reg.tokenType.toString(),
                 uri: reg.docsURI,
                 user: reg.user,
-                amount: reg.amount,
+                amount: stableCoinConverter.convertBNToStableCoin(reg.amount.toString(), decimals),
                 createdAt: reg.createdAt,
                 status: reg.status
 
@@ -179,11 +184,11 @@ export const InsuranceProvider = ({children}) => {
                 pkgs.push({
                     ...jsonData,
                     tokenId: pkg.tokenId.toString(),
-                    premiumPercentage: pkg.premiumPercentage / 10000,
+                    premiumPercentage: Number(pkg.premiumPercentage.toString()) / 10000,
                     tokenUri: pkg.tokenUri,
                     docsUri: reg.docsURI,
                     user: reg.user,
-                    valuationAmount: reg.valuationAmount,
+                    valuationAmount: stableCoinConverter.convertBNToStableCoin(reg.valuationAmount.toString(), decimals),
                     createdAt: reg.createdAt
                 })
             }
@@ -221,11 +226,11 @@ export const InsuranceProvider = ({children}) => {
                 pkgs.push({
                     ...jsonData,
                     tokenId: pkg.tokenId.toString(),
-                    premiumPercentage: pkg.premiumPercentage / 10000,
+                    premiumPercentage: Number(pkg.premiumPercentage.toString()) / 10000,
                     tokenUri: pkg.tokenUri,
                     docsUri: reg.docsURI,
                     user: reg.user,
-                    amount: reg.amount,
+                    amount: stableCoinConverter.convertBNToStableCoin(reg.amount.toString(), decimals),
                     createdAt: reg.createdAt,
                     status: reg.status
                 })
@@ -267,11 +272,11 @@ export const InsuranceProvider = ({children}) => {
             pkgs.push({
                 ...jsonData,
                 tokenId: pkg.tokenId.toString(),
-                premiumPercentage: pkg.premiumPercentage / 10000,
+                premiumPercentage: Number(pkg.premiumPercentage.toString()) / 10000,
                 tokenUri: pkg.tokenUri,
                 docsUri: reg.docsURI,
                 user: reg.user,
-                valuationAmount: reg.valuationAmount,
+                valuationAmount: stableCoinConverter.convertBNToStableCoin(reg.valuationAmount.toString(), decimals),
                 createdAt: reg.createdAt,
                 status: reg.status
             })
@@ -301,11 +306,11 @@ export const InsuranceProvider = ({children}) => {
             pkgs.push({
                 ...jsonData,
                 tokenId: pkg.tokenId.toString(),
-                premiumPercentage: pkg.premiumPercentage / 10000,
+                premiumPercentage: Number(pkg.premiumPercentage.toString()) / 10000,
                 tokenUri: pkg.tokenUri,
                 docsUri: reg.docsURI,
                 user: reg.user,
-                amount: reg.amount,
+                amount: stableCoinConverter.convertBNToStableCoin(reg.amount.toString(), decimals),
                 createdAt: reg.createdAt,
                 status: reg.status
             })
@@ -321,6 +326,9 @@ export const InsuranceProvider = ({children}) => {
     }, [ethereum])
 
     useEffect(() => {
+        
+
+        if (!decimals) return;
 
         if (insuranceContract) {
             getRegistrations()
@@ -335,7 +343,7 @@ export const InsuranceProvider = ({children}) => {
             
         }
         
-    }, [insuranceContract, selectedAccount])
+    }, [insuranceContract, selectedAccount, decimals])
 
 
     return (

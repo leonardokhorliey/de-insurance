@@ -17,13 +17,14 @@ export const VerifierProvider = ({children}) => {
     const [verifierContract, setVerifierContract] = useState()
     const [verifier, setVerifier] = useState(false)
     const [pendingVerifiers, setPendingVerifiers] = useState([])
-    const { ethereum, errorAlert, setLoading, selectedAccount, setIsVerifier, setIsOwner } = useContext(AppContext)
+    const { ethereum, errorAlert, setLoading, selectedAccount, setIsVerifier, setIsOwner, stableCoinConverter } = useContext(AppContext)
     const { decimals } = useContext(USDTContext)
 
     const registerAsVerifier = async (docsURI, contribution) => {
+        contribution = stableCoinConverter.convertStableCoinToBN(contribution, decimals)
         setLoading(true);
         try {
-            await verifierContract.registerAsVerifier(docsURI, (contribution*Number(`1e${decimals}`)).toString())
+            await verifierContract.registerAsVerifier(docsURI, contribution);
         } catch (e) {
             errorAlert(e.message);
         }
@@ -74,17 +75,19 @@ export const VerifierProvider = ({children}) => {
     }
 
     const getPendingVerifierApplications = async () => {
-        const apps = await verifierContract.getPendingVerifierAplications();
+        const apps = await verifierContract.getVerifiers();
 
         const p = apps.map((app) => {
             return {
                 address: app.user,
                 docsUri: app.supportingDocsURI,
+                contribution: stableCoinConverter.convertBNToStableCoin(app.contributionAmount.toString(), decimals),
+                whitelist: app.creator === app.user ? true : false,
                 status: app.status.toString()
             }
         })
 
-        //const approved = p.filter(k => k.status === '1');
+        const approved = p.filter(k => k.status === '1');
 
         setPendingVerifiers(p)
 

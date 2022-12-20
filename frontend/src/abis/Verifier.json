@@ -140,6 +140,13 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "closeVerifierSignUpPeriod",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -189,12 +196,81 @@
             },
             {
               "internalType": "uint256",
+              "name": "contributionAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
               "name": "status",
               "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "creator",
+              "type": "address"
             }
           ],
           "internalType": "struct Verifier.VerifierApplication[]",
           "name": "pending",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_verifier",
+          "type": "address"
+        }
+      ],
+      "name": "getVerifierReward",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "reward",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getVerifiers",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "supportingDocsURI",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "contributionAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "status",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "creator",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct Verifier.VerifierApplication[]",
+          "name": "",
           "type": "tuple[]"
         }
       ],
@@ -218,6 +294,13 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "openVerifierSignUpPeriod",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -332,8 +415,18 @@
         },
         {
           "internalType": "uint256",
+          "name": "contributionAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
           "name": "status",
           "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "creator",
+          "type": "address"
         }
       ],
       "stateMutability": "view",
@@ -382,6 +475,19 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "verifier",
+          "type": "address"
+        }
+      ],
+      "name": "whitelistVerifier",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     }
   ]

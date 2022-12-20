@@ -39,7 +39,7 @@ const Dashboard = () => {
             <div className="intro-area">
                 <div className="balance-box">
                     <h3>
-                        BNB Balance
+                        MATIC Balance
                     </h3>
                     <p>
                         {ethBalance}
