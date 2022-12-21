@@ -54,6 +54,12 @@ table > tr:nth-child(even) {
   
 }
 
+.table-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -427,6 +433,7 @@ footer > div > div > div {
   display: flex;
   flex-direction: column;
   padding: 100px 20px 50px 20px;
+  width: calc(100vw - 200px);
   height: 100vh;
   gap: 2rem;
 }

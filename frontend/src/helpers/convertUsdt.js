@@ -1,6 +1,7 @@
 
 
 const convertBNToStableCoin = (amount, decimals) => {
+    console.log(amount, ' ', decimals)
     let ln = amount.length;
 
     let whole;
@@ -16,13 +17,16 @@ const convertBNToStableCoin = (amount, decimals) => {
         decimal = amount.slice(ln-decimals);
     }
 
-    const stringVal = `${whole}.${decimal}`
+    const stringVal = `${whole}.${zeroFill}${decimal}`
 
     return stringVal;
 }
 
 const convertStableCoinToBN = (amount, decimals) => {
-    const [whole, decimal] = amount.split(".");
+    console.log(amount, ' bro', decimals)
+    let [whole, decimal] = amount.split(".");
+
+    if(!decimal) decimal = '0';
 
     const zeroFill = '0'.repeat(decimals - decimal.length);
 
@@ -35,7 +39,9 @@ const convertStableCoinToBN = (amount, decimals) => {
     return stringVal;
 }
 
-export default {
+const v = {
     convertBNToStableCoin,
     convertStableCoinToBN
 }
+
+export default v;

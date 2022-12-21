@@ -17,6 +17,7 @@ export const VerifierProvider = ({children}) => {
     const [verifierContract, setVerifierContract] = useState()
     const [verifier, setVerifier] = useState(false)
     const [pendingVerifiers, setPendingVerifiers] = useState([])
+    const [verifiers, setVerifiers] = useState([])
     const { ethereum, errorAlert, setLoading, selectedAccount, setIsVerifier, setIsOwner, stableCoinConverter } = useContext(AppContext)
     const { decimals } = useContext(USDTContext)
 
@@ -74,7 +75,7 @@ export const VerifierProvider = ({children}) => {
         setLoading(false);
     }
 
-    const getPendingVerifierApplications = async () => {
+    const getVerifiers = async () => {
         const apps = await verifierContract.getVerifiers();
 
         const p = apps.map((app) => {
@@ -89,7 +90,10 @@ export const VerifierProvider = ({children}) => {
 
         const approved = p.filter(k => k.status === '1');
 
-        setPendingVerifiers(p)
+        const pending = p.filter(k => k.status === '0');
+
+        setPendingVerifiers(pending)
+        setVerifiers(approved)
 
     }
 
@@ -110,7 +114,7 @@ export const VerifierProvider = ({children}) => {
         if(verifierContract && selectedAccount) {
             checkIfVerifier(selectedAccount)
             isContractOwner(selectedAccount)
-            getPendingVerifierApplications()
+            getVerifiers()
         }
     }, [verifierContract, selectedAccount])
 

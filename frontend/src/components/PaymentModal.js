@@ -24,7 +24,7 @@ const PaymentModal = ({amount, makePayment, closeModal}) => {
                             setAmountToPay(e.target.value);
                         }}/>}
                 </div>
-                {!approvalDone && <button onClick={() => approveContractForAmount(contractAddresses.insuranceContract, amountToPay)}>
+                {!approvalDone && <button onClick={() => approveContractForAmount(contractAddresses.verifierContract, amountToPay)}>
                     Approve {amountToPay} StableCoins
                 </button>}
                 {approvalDone && <button onClick={() => makePayment(amountToPay)}>

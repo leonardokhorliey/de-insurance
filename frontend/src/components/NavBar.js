@@ -28,9 +28,9 @@ const NavBar = () => {
                                 <Link style={{ textDecoration: 'none', fontFamily: 'Montserrat', fontWeight: 300 }}to= "/about">About</Link>
                             </li>
 
-                            <li>
+                            {selectedAccount && <li>
                                 <Link style={{ textDecoration: 'none', fontFamily: 'Montserrat', fontWeight: 300 }}to= "/profile">Profile</Link>
-                            </li>
+                            </li>}
                         </ul>
 
                     </nav>

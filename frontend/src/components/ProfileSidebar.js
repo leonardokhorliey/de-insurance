@@ -63,7 +63,7 @@ const ProfileSidebar = ({setSelectedSidebarOption, disconnectWallet}) => {
             <div className="sidebar-list">
                 <div>
                     <h1>
-                        De-Insure
+                        <Link style={{ textDecoration: 'none', fontFamily: 'Montserrat', fontWeight: 500, color: 'white' }}to="/">De-Insure</Link>
                     </h1>
                 </div>
                 <div className="sidebar-options">

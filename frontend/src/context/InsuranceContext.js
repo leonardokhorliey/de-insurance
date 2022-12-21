@@ -128,7 +128,7 @@ export const InsuranceProvider = ({children}) => {
             setRegistrations(registrations)
 
         } catch (e) {
-            errorAlert(e.message);
+            //errorAlert(e.message);
             
         }
     }
@@ -152,7 +152,7 @@ export const InsuranceProvider = ({children}) => {
             setClaims(claims)
 
         } catch (e) {
-            errorAlert(e.message);
+            //errorAlert(e.message);
             
         }
     }
@@ -326,8 +326,6 @@ export const InsuranceProvider = ({children}) => {
     }, [ethereum])
 
     useEffect(() => {
-        
-
         if (!decimals) return;
 
         if (insuranceContract) {

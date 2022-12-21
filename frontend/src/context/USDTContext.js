@@ -20,23 +20,22 @@ export const USDTProvider = ({children}) => {
     const { ethereum, errorAlert, setLoading, selectedAccount, stableCoinConverter } = useContext(AppContext)
 
     const approveContractForAmount = async (addressToApprove, amount) => {
+        console.log(addressToApprove, amount)
         amount = stableCoinConverter.convertStableCoinToBN(amount.toString(), decimals)
-        setLoading(true);
         try {
             await usdtContract.approve(addressToApprove, amount)
+            setApprovalDone(true);
         } catch (e) {
             errorAlert(e.message);
         }
-
-        setLoading(false);
-        setApprovalDone(true);
+        
     }
 
     const getUsdtBalance = async (address) => {
         try {
             const balance = await usdtContract.balanceOf(address);
             const decimals = Number(await usdtContract.decimals());
-            const bal = stableCoinConverter.convertBNToStableCoin(balance, decimals)
+            const bal = stableCoinConverter.convertBNToStableCoin(balance.toString(), decimals)
             console.log("USDT ", bal)
             setUsdtBalance(bal);
         } catch (e) {

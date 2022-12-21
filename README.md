@@ -50,9 +50,9 @@ Front end code is available in the `/frontend` directory. Go through the [README
 
 `De-Insure Token (ERC1155)` - https://mumbai.polygonscan.com/address/0xAE657Be47195f0a2AC3b13c3fd1BA30A3C6234Bd#code
 
-`Verifier Contract` - https://mumbai.polygonscan.com/address/0x4583c30108323e03b31aC31Cc8698cF14E013952#code
+`Verifier Contract` - https://mumbai.polygonscan.com/address/0x9FC82946dcdaCD65eC2415b15114Af241Ec6E0Ca#code
 
-`De-Insure Main Contract` - https://mumbai.polygonscan.com/address/0x53408c2750404b5a43dfAceF67B006a5c56c7E84#code
+`De-Insure Main Contract` - https://mumbai.polygonscan.com/address/0xe88f53a585eD38551E0b305a56f8322E0CF33d93#code
 
 
 # Live URL

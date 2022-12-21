@@ -1,8 +1,8 @@
 import React, { useState, useEffect, createContext } from 'react';
-import { InsuranceContext, InsuranceProvider } from './InsuranceContext';
-import { USDTContext, USDTProvider } from './USDTContext';
-import { VerifierContext, VerifierProvider } from './VerifierContext';
-import { TokenContext, TokenProvider } from './TokenContext';
+import { InsuranceProvider } from './InsuranceContext';
+import { USDTProvider } from './USDTContext';
+import { VerifierProvider } from './VerifierContext';
+import { TokenProvider } from './TokenContext';
 import { ethers } from 'ethers';
 import { abis, contractAddresses } from '../abis';
 import stableCoinConverter from '../helpers/convertUsdt';
@@ -20,16 +20,21 @@ export const AppContextProvider = ({children}) => {
     const [isVerifier, setIsVerifier] = useState(false)
 
     const errorAlert = (message) => {
-        console.log("Process failed with error ", message);
+       alert("Process failed with error ", message);
     }
 
     const checkIfWalletIsConnected = async () => {
-        const accounts = await ethereum.request({method: 'eth_accounts'});
+        try {
+            const accounts = await ethereum.request({method: 'eth_accounts'});
 
-        if (accounts.length > 0) {
-            setSelectedAccount(accounts[0]);
-            setEthBalance(await getEthBalance(accounts[0]))
+            if (accounts.length > 0) {
+                setSelectedAccount(accounts[0]);
+                setEthBalance(await getEthBalance(accounts[0]))
+            }
+        } catch (e) {
+            console.log(e.message)
         }
+        
         
     }
 
@@ -37,7 +42,7 @@ export const AppContextProvider = ({children}) => {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const balance = await provider.getBalance(account);
 
-        return ethers.utils.formatEther(balance);
+        return ethers.utils.formatEther(balance).slice(0, 10);
     }
 
     const connectWallet = async () => {

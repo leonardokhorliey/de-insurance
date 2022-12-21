@@ -47,7 +47,7 @@ contract Verifier is Ownable {
         require(verifierSignUpOpen, "Unauthorized at this time");
         require(enrolledAsVerifier(msg.sender) == -1, "Previously attempted enroll as verifier");
 
-        usdtContract.transfer(poolAddress, contributionAmount);
+        usdtContract.transferFrom(msg.sender, poolAddress, contributionAmount);
 
         verifierApplications.push(VerifierApplication(msg.sender, profileDocURI, contributionAmount, 0, msg.sender));
     }

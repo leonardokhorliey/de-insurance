@@ -70,7 +70,7 @@ const AdminView = () => {
                                     {`${verifier.address.substring(0, 10)}...`}
                                 </td>
                                 <td>
-                                    <Link style={{ textDecoration: 'none', fontFamily: 'Montserrat', fontWeight: 300 }} to= "/">{verifier.docsURI}</Link>
+                                    <a style={{ textDecoration: 'none', fontFamily: 'Montserrat', fontWeight: 300 }} href= {verifier.docsUri}>Profile Docs</a>
                                 </td>
                                 <td>
                                     {verifier.contribution}
@@ -79,7 +79,7 @@ const AdminView = () => {
                                     {verifier.createdAt}
                                 </td>
                                 <td>
-                                    <div id="table-action">
+                                    <div className="table-action">
                                         <button>
                                             Verify
                                         </button>
